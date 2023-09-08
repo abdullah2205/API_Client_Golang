@@ -9,10 +9,6 @@ import (
 	"encoding/json"
 )
 
-// type AuthResponse struct {
-//     Token string `json:"token"`
-// }
-
 var token string
 
 func sendLoginRequest(email, password string) (string, error) {
