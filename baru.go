@@ -77,7 +77,7 @@ func login(c *gin.Context) {
 
     token = getToken
     // Jika kredensial valid, kirimkan token akses sebagai respons
-    c.JSON(http.StatusOK, gin.H{"pesan": "Berhasil Login", "token": token})
+    c.JSON(http.StatusOK, gin.H{"pesan": "Berhasil Login go", "token": token})
 }
 
 func getUser(c *gin.Context) {
@@ -118,7 +118,7 @@ func getUser(c *gin.Context) {
 }
 
 func getBuku(c *gin.Context) {
-    url := "http://127.0.0.1:8000/api/buku" // Ganti port dengan port API Laravel Anda
+    url := "http://127.0.0.1:8000/api/buku"
 
     req, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -152,6 +152,10 @@ func getBuku(c *gin.Context) {
 
     data := string(body)
     c.JSON(http.StatusOK, gin.H{"data": data})
+}
+
+func addBuku(c *gin.Context){
+    //
 }
 
 func getBukuByID(c *gin.Context) {
@@ -194,6 +198,10 @@ func getBukuByID(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"data": data})
 }
 
+func updateBuku(c *gin.Context){
+    //
+}
+
 func logout(c *gin.Context) {
 	url := "http://127.0.0.1:8000/api/logout" // Ganti dengan URL API Laravel Anda
 
@@ -229,7 +237,7 @@ func logout(c *gin.Context) {
 
     token = ""
 
-	c.JSON(http.StatusOK, gin.H{"message": "Logout berhasil", "response": string(body)})
+	c.JSON(http.StatusOK, gin.H{"data": string(body)})
 }
 
 func main() {
@@ -240,7 +248,11 @@ func main() {
 
 	router.GET("/api/buku", getBuku)
 
+    router.POST("/api/buku/add", addBuku)
+
     router.GET("/api/buku/:id_buku", getBukuByID)
+
+    router.PUT("/api/buku/:id_buku", updateBuku)
 
 	router.POST("/api/logout", logout)
 
