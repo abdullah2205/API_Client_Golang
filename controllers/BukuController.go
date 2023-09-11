@@ -186,7 +186,41 @@ func UpdateBuku(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"data": data_update})
 }
 
+func DeleteBuku(c *gin.Context) {
+    id := c.Param("id_buku")
 
-func DeleteBuku(c *gin.Context){
-    //
+    url := "http://127.0.0.1:8000/api/buku/" + id
+
+    req, err := http.NewRequest("DELETE", url, nil)
+    if err != nil {
+        fmt.Println("Gagal membuat permintaan HTTP:", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat permintaan HTTP"})
+        return
+    }
+
+    req.Header.Set("Authorization", "Bearer "+ GetToken())
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        fmt.Println("Gagal melakukan permintaan HTTP:", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal melakukan permintaan HTTP"})
+        return
+    }
+    defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        fmt.Println("Gagal mengambil data, status kode:", resp.StatusCode)
+        c.JSON(http.StatusBadGateway, gin.H{"error": "Gagal mengambil data"})
+        return
+    }
+
+    body, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println("Gagal membaca respons:", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca respons"})
+        return
+    }
+
+    data := string(body)
+    c.JSON(http.StatusOK, gin.H{"data": data})
 }
