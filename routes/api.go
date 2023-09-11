@@ -16,7 +16,7 @@ func SetupRoutes(router *gin.Engine) {
 
 	router.GET("/api/buku/:id_buku", controllers.GetBukuByID)
 
-	//router.PUT("/api/buku/:id_buku", controllers.UpdateBuku)
+	router.PUT("/api/buku/:id_buku", controllers.UpdateBuku)
 
 	//router.PUT("/api/buku/:id_buku", controllers.DeleteBuku)
 
