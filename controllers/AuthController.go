@@ -11,6 +11,73 @@ import (
 
 var token string
 
+//register
+func sendRegisterRequest(email, password, name string) (string, error) {
+    url := "http://127.0.0.1:8000/api/register"
+
+    // Membuat permintaan HTTP untuk registrasi
+    data := strings.NewReader(fmt.Sprintf(`{"email": "%s", "password": "%s", "name": "%s"}`, email, password, name))
+    req, err := http.NewRequest("POST", url, data)
+    if err != nil {
+        return "", err
+    }
+    req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return "", err
+    }
+    defer resp.Body.Close()
+
+    // Membaca token akses dari respons jika registrasi berhasil
+    if resp.StatusCode == http.StatusOK {
+        bodyBytes, err := ioutil.ReadAll(resp.Body)
+        if err != nil {
+            return "", err
+        }
+        token := string(bodyBytes)
+        return token, nil
+    } else {
+        return "", fmt.Errorf("Gagal registrasi, status kode: %d", resp.StatusCode)
+    }
+}
+
+func Register(c *gin.Context) {
+    var requestBody struct {
+		Name     string `json:"name"`
+        Email    string `json:"email"`
+        Password string `json:"password"`
+    }
+
+    if err := c.ShouldBindJSON(&requestBody); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+	
+    receivedToken, err := sendRegisterRequest(requestBody.Email, requestBody.Password, requestBody.Name)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Gagal registrasi"})
+        return
+    }
+
+	var responseMap map[string]interface{}
+    if err := json.Unmarshal([]byte(receivedToken), &responseMap); err != nil { //uraikan respon token dalam bentuk json dari receivedToken
+        fmt.Println("Gagal menguraikan JSON:", err) 	
+        return
+    }
+
+    valueToken, found := responseMap["token"].(string)
+    if !found {
+        fmt.Println("Token tidak ditemukan dalam respons JSON")
+        return
+    }
+
+    token = valueToken //isi nilai token
+	
+    c.JSON(http.StatusOK, gin.H{"pesan": "Registrasi berhasil", "token": receivedToken})
+}
+//end register
+
 func sendLoginRequest(email, password string) (string, error) {
     url := "http://127.0.0.1:8000/api/login"
 
@@ -22,9 +89,7 @@ func sendLoginRequest(email, password string) (string, error) {
     }
     req.Header.Set("Content-Type", "application/json")
 
-    // Melakukan permintaan HTTP
-    client := &http.Client{}
-    resp, err := client.Do(req)
+    resp, err := http.DefaultClient.Do(req)
     if err != nil {
         return "", err
     }
