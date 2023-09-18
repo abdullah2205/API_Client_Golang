@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"io/io"
+	"io"
 	"net/http"
 	"strings"
 
